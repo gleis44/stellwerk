@@ -1,0 +1,35 @@
+version: "3"
+services:
+  keycloak_server:
+    image: "jboss/keycloak:12.0.2"
+    depends_on:
+      - "keycloak_db"
+    ports:
+      - "${KEYCLOAK_HTTP_PORT:-8080}:8080"
+    volumes:
+      - "./themes/${COMPOSE_PROJECT_NAME}/:/opt/jboss/keycloak/themes/${COMPOSE_PROJECT_NAME}/:rw"
+    environment:
+      - "DEBUG=${DEBUG:-true}"
+      - "DB_VENDOR=postgres"
+      - "DB_ADDR=keycloak_db"
+      - "DB_DATABASE=${DATABASE_NAME:-keycloak}"
+      - "DB_USER=${DATABASE_USER:-keycloak}"
+      - "DB_PASSWORD=${DATABASE_PASS:-keycloak}"
+      - "KEYCLOAK_USER=${KEYCLOAK_USER:-keycloak}"
+      - "KEYCLOAK_PASSWORD=${KEYCLOAK_PASS:-keycloak}"
+      - "PROXY_ADDRESS_FORWARDING=${PROXY:-false}"
+
+  keycloak_db:
+    image: "postgres:13.1"
+    volumes:
+      #- "$PWD/postgres/postgresql.conf:/etc/postgresql/postgresql.conf" //@todo link custom postgres configuration file
+      - "keycloak_db_data:/var/lib/postgresql/data"
+    environment:
+      - "DEBUG=${DEBUG:-true}"
+      - "POSTGRES_DB=${DATABASE_NAME:-keycloak}"
+      - "POSTGRES_USER=${DATABASE_USER:-keycloak}"
+      - "POSTGRES_PASSWORD=${DATABASE_PASS:-keycloak}"
+      #- "LANG=${LOCALE:-en_US}" //@todo add language config for container bild
+
+volumes:
+  keycloak_db_data:
