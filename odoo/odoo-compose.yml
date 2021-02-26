@@ -1,0 +1,46 @@
+version: '3'
+services:
+  odoo_server:
+    image: "odoo:14"
+    depends_on:
+      - "odoo_db"
+    networks:
+      - "odoo_network"
+    ports:
+      - "8069:8069"
+      - "8071-8072:8071-8072"
+    links:
+      - "odoo_db:odoo_db"
+    volumes:
+      - "odoo_web_data:/var/lib/odoo"
+      - "./config:/etc/odoo"
+      - "./addons:/mnt/extra-addons"
+    environment:
+      - "DEBUG=${DEBUG:-true}"
+      - "HOST=${DATABASE_HOST:-odoo_db}"
+      - "PORT=${DATABASE_PORT:-5432}"
+      - "USER=${DATABASE_USER:-odoo}"
+      - "PASSWORD=${DATABASE_PASS:-odoo}"
+
+  odoo_db:
+    image: "postgres:13.1"
+    networks:
+      - "odoo_network"
+    ports:
+      - "${DATABASE_PORT:-5432}:${DATABASE_PORT:-5432}"
+    volumes:
+      - "odoo_db_data:/var/lib/postgresql/data"
+      #- ./data/postgresql:/var/lib/postgresql
+    environment:
+      - "DEBUG=${DEBUG:-true}"
+      - "POSTGRES_PORT=${DATABASE_PORT:-5432}"
+      - "POSTGRES_DB=postgres"
+      - "POSTGRES_USER=${DATABASE_USER:-odoo}"
+      - "POSTGRES_PASSWORD=${DATABASE_PASS:-odoo}"
+
+networks:
+  odoo_network:
+
+volumes:
+  odoo_web_data:
+  odoo_db_data:
