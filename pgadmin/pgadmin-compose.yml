@@ -1,0 +1,14 @@
+version: '3'
+services:
+  pgadmin:
+    image: "dpage/pgadmin4:latest"
+    networks:
+      - "pgadmin_network"
+    ports:
+      - "80:80"
+    environment:
+      - "PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-webmaster@acme.com}"
+      - "PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-pgadmin}"
+
+networks:
+  pgadmin_network:
